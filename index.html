@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Recommender - Smart Food Matcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        secondary: '#8b5cf6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+        .tag {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin: 2px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            z-index: 2000;
+            display: none;
+        }
+        .notification.success { background: #10b981; }
+        .notification.error { background: #ef4444; }
+        .notification.warning { background: #f59e0b; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen font-sans">
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-gradient-to-r from-primary to-secondary p-2 rounded-xl">
+                        <i class="fas fa-utensils text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                            Recipe Recommender
+                        </h1>
+                        <p class="text-sm text-gray-600">Smart Food Matcher</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <span class="text-gray-600 text-sm">Powered by Salima & GEMINI AI</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-bold text-slate-900 mb-4">
+                What's in your 
+                <span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">kitchen</span>?
+            </h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                Enter your ingredients and let our AI chef create amazing recipes just for you
+            </p>
+            
+            <!-- Search Section -->
+            <div class="max-w-2xl mx-auto">
+                <div class="flex gap-4 mb-6">
+                    <input
+                        id="ingredientsInput"
+                        type="text"
+                        placeholder="e.g., chicken, tomatoes, onions, garlic..."
+                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-lg"
+                    />
+                    <button id="generateBtn" class="btn-primary">
+                        <i class="fas fa-magic mr-2"></i>
+                        Generate
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="flex justify-center mb-8">
+            <div class="glass rounded-xl p-1">
+                <button id="searchTab" class="px-6 py-3 rounded-lg transition-all bg-gradient-to-r from-primary to-secondary text-white shadow-lg">
+                    <i class="fas fa-search mr-2"></i>
+                    New Recipes (<span id="newRecipesCount">0</span>)
+                </button>
+                <button id="savedTab" class="px-6 py-3 rounded-lg transition-all text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-bookmark mr-2"></i>
+                    Saved Recipes (<span id="savedRecipesCount">0</span>)
+                </button>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div id="contentArea" class="fade-in">
+            <!-- Loading State -->
+            <div id="loadingState" class="text-center py-20" style="display: none;">
+                <div class="loading-spinner"></div>
+                <p class="mt-4 text-gray-600">Our AI chef is cooking up something special...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-20">
+                <div class="glass rounded-2xl p-12 max-w-md mx-auto">
+                    <i class="fas fa-utensils text-6xl text-gray-300 mb-6"></i>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Ready to Cook?</h3>
+                    <p class="text-gray-600">Enter your ingredients above to discover amazing recipes!</p>
+                </div>
+            </div>
+
+            <!-- Recipes Grid -->
+            <div id="recipesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none;"></div>
+        </div>
+    </main>
+
+    <!-- Recipe Modal -->
+    <div id="recipeModal" class="modal">
+        <div class="modal-content">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="modalTitle" class="text-2xl font-bold"></h2>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        //const API_BASE = 'http://localhost:8002/api';
+        const API_BASE = '/api';
+        let currentRecipes = [];
+        let allRecipes = [];
+        let activeTab = 'search';
+
+        // DOM Elements
+        const ingredientsInput = document.getElementById('ingredientsInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const searchTab = document.getElementById('searchTab');
+        const savedTab = document.getElementById('savedTab');
+        const loadingState = document.getElementById('loadingState');
+        const emptyState = document.getElementById('emptyState');
+        const recipesGrid = document.getElementById('recipesGrid');
+        const modal = document.getElementById('recipeModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        const closeModal = document.getElementById('closeModal');
+        const newRecipesCount = document.getElementById('newRecipesCount');
+        const savedRecipesCount = document.getElementById('savedRecipesCount');
+        const notification = document.getElementById('notification');
+
+        // Utility Functions
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        function showLoading() {
+            loadingState.style.display = 'block';
+            emptyState.style.display = 'none';
+            recipesGrid.style.display = 'none';
+        }
+
+        function hideLoading() {
+            loadingState.style.display = 'none';
+        }
+
+        function showEmpty() {
+            emptyState.style.display = 'block';
+            recipesGrid.style.display = 'none';
+            hideLoading();
+        }
+
+        function showRecipes() {
+            emptyState.style.display = 'none';
+            recipesGrid.style.display = 'grid';
+            hideLoading();
+        }
+
+        // Create Recipe Card HTML
+        function createRecipeCard(recipe) {
+            return `
+                <div class="glass rounded-xl p-6 card-hover cursor-pointer" onclick="openRecipeModal(${recipe.id})">
+                    <div class="mb-4">
+                        <div class="h-32 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-cookie-bite text-4xl text-primary/30"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${recipe.title}</h3>
+                        
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            ${recipe.ingredients.slice(0, 3).map(ing => `<span class="tag">${ing}</span>`).join('')}
+                            ${recipe.ingredients.length > 3 ? `<span class="tag">+${recipe.ingredients.length - 3} more</span>` : ''}
+                        </div>
+
+                        <div class="flex justify-between items-center text-sm text-gray-600">
+                            <span><i class="far fa-clock mr-1"></i>${recipe.prep_time}</span>
+                            <span><i class="fas fa-signal mr-1"></i>${recipe.difficulty}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render Recipes
+        function renderRecipes(recipes) {
+            if (recipes.length === 0) {
+                showEmpty();
+                return;
+            }
+
+            recipesGrid.innerHTML = recipes.map(createRecipeCard).join('');
+            showRecipes();
+        }
+
+        // Fetch All Recipes
+        async function fetchAllRecipes() {
+            try {
+                const response = await fetch(`${API_BASE}/recipes`);
+                const data = await response.json();
+                if (data.success) {
+                    allRecipes = data.recipes;
+                    savedRecipesCount.textContent = allRecipes.length;
+                    if (activeTab === 'saved') {
+                        renderRecipes(allRecipes);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching recipes:', error);
+            }
+        }
+
+        // Generate Recipes
+        async function generateRecipes() {
+            const ingredients = ingredientsInput.value.trim();
+            if (!ingredients) {
+                showNotification('Please enter some ingredients!', 'warning');
+                return;
+            }
+
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generating...';
+            showLoading();
+
+            try {
+                const response = await fetch(`${API_BASE}/recipes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ingredients })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    currentRecipes = data.recipes;
+                    newRecipesCount.textContent = currentRecipes.length;
+                    renderRecipes(currentRecipes);
+                    showNotification(`Generated ${data.count} recipes!`);
+                    await fetchAllRecipes(); // Refresh saved recipes
+                } else {
+                    showNotification(data.error || 'Failed to generate recipes', 'error');
+                    showEmpty();
+                }
+            } catch (error) {
+                showNotification('Network error. Please try again.', 'error');
+                showEmpty();
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-magic mr-2"></i>Generate';
+            }
+        }
+
+        // Open Recipe Modal
+        function openRecipeModal(recipeId) {
+            const recipe = [...currentRecipes, ...allRecipes].find(r => r.id === recipeId);
+            if (!recipe) return;
+
+            modalTitle.textContent = recipe.title;
+            modalContent.innerHTML = `
+                <div class="space-y-6">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="tag"><i class="far fa-clock mr-1"></i>${recipe.prep_time}</span>
+                        <span class="tag"><i class="fas fa-signal mr-1"></i>${recipe.difficulty}</span>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 flex items-center">
+                            <i class="fas fa-list-ul mr-2 text-primary"></i>
+                            Ingredients
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            ${recipe.ingredients.map(ing => 
+                                `<div class="flex items-center bg-gray-50 p-2 rounded-lg">
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    <span>${ing}</span>
+                                </div>`
+                            ).join('')}
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-200">
+
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 flex items-center">
+                            <i class="fas fa-tasks mr-2 text-secondary"></i>
+                            Instructions
+                        </h4>
+                        <div class="space-y-3">
+                            ${recipe.instructions.map((step, idx) =>
+                                `<div class="flex items-start bg-blue-50 p-3 rounded-lg">
+                                    <div class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-semibold mr-3 mt-0.5">
+                                        ${idx + 1}
+                                    </div>
+                                    <span class="flex-1">${step}</span>
+                                </div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.style.display = 'block';
+        }
+
+        // Tab Switching
+        function switchTab(tab) {
+            activeTab = tab;
+            
+            if (tab === 'search') {
+                searchTab.className = 'px-6 py-3 rounded-lg transition-all bg-gradient-to-r from-primary to-secondary text-white shadow-lg';
+                savedTab.className = 'px-6 py-3 rounded-lg transition-all text-gray-600 hover:text-gray-900';
+                renderRecipes(currentRecipes);
+            } else {
+                searchTab.className = 'px-6 py-3 rounded-lg transition-all text-gray-600 hover:text-gray-900';
+                savedTab.className = 'px-6 py-3 rounded-lg transition-all bg-gradient-to-r from-primary to-secondary text-white shadow-lg';
+                renderRecipes(allRecipes);
+            }
+        }
+
+        // Event Listeners
+        generateBtn.addEventListener('click', generateRecipes);
+        ingredientsInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') generateRecipes();
+        });
+        searchTab.addEventListener('click', () => switchTab('search'));
+        savedTab.addEventListener('click', () => switchTab('saved'));
+        closeModal.addEventListener('click', () => modal.style.display = 'none');
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+
+        // Initialize
+        fetchAllRecipes();
+    </script>
+</body>
+</html>
