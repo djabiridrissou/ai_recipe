@@ -264,27 +264,6 @@ def get_recipe(recipe_id):
     except mysql.connector.Error as e:
         return jsonify({'error': f'Database error: {str(e)}'}), 500
 
-@app.route('/api/init-db', methods=['POST'])
-def force_init_database():
-    """Force database initialization - ADMIN USE ONLY"""
-    try:
-        result = init_database()
-        if result:
-            return jsonify({
-                'success': True,
-                'message': 'Database initialized successfully'
-            })
-        else:
-            return jsonify({
-                'success': False,
-                'message': 'Database initialization failed'
-            }), 500
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
 @app.route('/api/models', methods=['GET'])
 def list_models():
     """Debug: List available models"""
