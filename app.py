@@ -17,17 +17,25 @@ if not GEMINI_API_KEY:
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-# MySQL Configuration - TOUTES LES CONFIGS DEPUIS L'ENVIRONNEMENT
+# MySQL Configuration pour Aiven
 MYSQL_CONFIG = {
     'host': os.getenv('MYSQL_HOST', 'localhost'),
+    'port': int(os.getenv('MYSQL_PORT', '3306')),
     'user': os.getenv('MYSQL_USER', 'root'),
     'password': os.getenv('MYSQL_PASSWORD', ''),
-    'database': os.getenv('MYSQL_DATABASE', 'recipe_app'),
-    'charset': 'utf8mb4'
+    'database': os.getenv('MYSQL_DATABASE', 'defaultdb'),
+    'charset': 'utf8mb4',
+    'ssl_disabled': False,  # SSL activé pour Aiven
+    'use_unicode': True
 }
 
 def get_db_connection():
-    return mysql.connector.connect(**MYSQL_CONFIG)
+    try:
+        conn = mysql.connector.connect(**MYSQL_CONFIG)
+        return conn
+    except mysql.connector.Error as e:
+        print(f"❌ Database connection failed: {e}")
+        raise
 
 def init_database():
     """Initialize database and create tables"""
@@ -59,7 +67,7 @@ def init_database():
         return False
     return True
 
-# NOUVEAU: Route pour servir le frontend
+# Route pour servir le frontend
 @app.route('/')
 def index():
     """Serve the main HTML page"""
@@ -257,7 +265,7 @@ def health_check():
             'status': 'healthy',
             'timestamp': datetime.now().isoformat(),
             'total_recipes': total_recipes,
-            'database': 'connected',
+            'database': 'connected (Aiven MySQL)',
             'environment': 'production' if not app.debug else 'development'
         })
     except Exception as e:
@@ -271,13 +279,15 @@ if __name__ == '__main__':
     print("🚀 Recipe API Server Starting...")
     
     # Check for required environment variables
-    required_vars = ['GEMINI_API_KEY']
+    required_vars = ['GEMINI_API_KEY', 'MYSQL_HOST', 'MYSQL_USER', 'MYSQL_PASSWORD']
     missing_vars = [var for var in required_vars if not os.getenv(var)]
     
     if missing_vars:
         print(f"❌ Missing required environment variables: {', '.join(missing_vars)}")
         print("Please set these before running the app!")
         exit(1)
+    
+    print(f"🗄️  Connecting to MySQL at: {os.getenv('MYSQL_HOST')}:{os.getenv('MYSQL_PORT', '3306')}")
     
     # Initialize database
     if not init_database():
@@ -290,7 +300,7 @@ if __name__ == '__main__':
     print("   GET /api/recipes - List all saved recipes")
     print("   GET /api/recipes/<id> - Get specific recipe")
     print("   GET /api/health - Health check")
-    print("🗄️  Using MySQL database")
+    print("🗄️  Using Aiven MySQL database")
     print("🤖 Using Gemini 1.5 Flash")
     
     # Use PORT from environment (for cloud deployment) or default to 8002
