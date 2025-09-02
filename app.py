@@ -43,19 +43,40 @@ def init_database():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Create recipes table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS recipes (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                ingredients JSON NOT NULL,
-                instructions JSON NOT NULL,
-                prep_time VARCHAR(50),
-                difficulty VARCHAR(20),
-                source_ingredients TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
+        # Vérifier si la table existe
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM information_schema.tables 
+            WHERE table_schema = %s 
+            AND table_name = 'recipes'
+        """, (os.getenv('MYSQL_DATABASE', 'defaultdb'),))
+        
+        table_exists = cursor.fetchone()[0] > 0
+        print(f"📊 Table 'recipes' exists: {table_exists}")
+        
+        if not table_exists:
+            print("🔨 Creating recipes table...")
+            # Create recipes table - format compatible Aiven MySQL
+            cursor.execute('''
+                CREATE TABLE recipes (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    title VARCHAR(255) NOT NULL,
+                    ingredients JSON NOT NULL,
+                    instructions JSON NOT NULL,
+                    prep_time VARCHAR(50),
+                    difficulty VARCHAR(20),
+                    source_ingredients TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            print("✅ Table 'recipes' created successfully")
+        else:
+            print("✅ Table 'recipes' already exists")
+        
+        # Test d'insertion pour vérifier la connexion
+        cursor.execute("SELECT COUNT(*) FROM recipes")
+        count = cursor.fetchone()[0]
+        print(f"📊 Current recipes count: {count}")
         
         conn.commit()
         cursor.close()
@@ -64,6 +85,8 @@ def init_database():
         
     except mysql.connector.Error as e:
         print(f"❌ Database initialization error: {e}")
+        print(f"❌ Error code: {e.errno}")
+        print(f"❌ Error message: {e.msg}")
         return False
     return True
 
@@ -240,6 +263,27 @@ def get_recipe(recipe_id):
         
     except mysql.connector.Error as e:
         return jsonify({'error': f'Database error: {str(e)}'}), 500
+
+@app.route('/api/init-db', methods=['POST'])
+def force_init_database():
+    """Force database initialization - ADMIN USE ONLY"""
+    try:
+        result = init_database()
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'Database initialized successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Database initialization failed'
+            }), 500
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @app.route('/api/models', methods=['GET'])
 def list_models():
