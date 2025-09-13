@@ -14,44 +14,214 @@
                     colors: {
                         primary: '#6366f1',
                         secondary: '#8b5cf6',
+                    },
+                    screens: {
+                        'xs': '375px',
                     }
                 }
             }
         }
     </script>
     <style>
-        .glass {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
+        /* Animations subtiles */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #6366f1;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+        }
+
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Hero title animation */
+        .hero-title {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .hero-subtitle {
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        .search-box {
+            animation: scaleIn 0.6s ease-out 0.4s both;
+        }
+
+        /* Gradient animé pour le titre */
+        .gradient-text {
+            background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899, #6366f1);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-flow 3s ease infinite;
+        }
+
+        /* Glass effect responsive */
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        /* Card animations */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .card-hover:hover::before {
+            left: 100%;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+        }
+
+        /* Animation d'entrée des cartes */
+        .recipe-card {
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .recipe-card:nth-child(1) { animation-delay: 0.1s; }
+        .recipe-card:nth-child(2) { animation-delay: 0.2s; }
+        .recipe-card:nth-child(3) { animation-delay: 0.3s; }
+        .recipe-card:nth-child(4) { animation-delay: 0.4s; }
+        .recipe-card:nth-child(5) { animation-delay: 0.5s; }
+        .recipe-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* Loading animation améliorée */
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6366f1;
+            animation: pulse-soft 1.4s ease-in-out infinite;
+        }
+
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        .loading-spinner {
+            border: 3px solid rgba(99, 102, 241, 0.1);
+            border-top: 3px solid #6366f1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            margin: 0 auto;
+        }
+
+        /* Button animations */
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Tab animations */
+        .tab-button {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            animation: scaleIn 0.3s ease;
+        }
+
+        /* Modal animations */
         .modal {
             display: none;
             position: fixed;
@@ -62,46 +232,41 @@
             height: 100%;
             background-color: rgba(0,0,0,0.5);
             backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
         }
+
         .modal-content {
             background-color: white;
-            margin: 5% auto;
+            margin: 2% auto;
             padding: 0;
             border-radius: 16px;
             width: 90%;
             max-width: 700px;
-            max-height: 80vh;
+            max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
         }
+
+        /* Tags avec hover effect */
         .tag {
             display: inline-block;
-            background: #e0e7ff;
+            background: linear-gradient(135deg, #e0e7ff, #f0f4ff);
             color: #3730a3;
-            padding: 2px 8px;
+            padding: 4px 10px;
             border-radius: 12px;
             font-size: 0.75rem;
             margin: 2px;
+            transition: all 0.2s ease;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border: none;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
+
+        .tag:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-        }
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
+
+        /* Notification animations */
         .notification {
             position: fixed;
             top: 20px;
@@ -111,117 +276,179 @@
             color: white;
             z-index: 2000;
             display: none;
+            animation: slideInFromRight 0.3s ease;
         }
-        .notification.success { background: #10b981; }
-        .notification.error { background: #ef4444; }
-        .notification.warning { background: #f59e0b; }
+
+        @keyframes slideInFromRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.success { background: linear-gradient(135deg, #10b981, #34d399); }
+        .notification.error { background: linear-gradient(135deg, #ef4444, #f87171); }
+        .notification.warning { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+
+        /* Input focus animation */
+        input:focus {
+            animation: pulse-soft 2s infinite;
+        }
+
+        /* Icon float animation */
+        .float-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Responsive adjustments pour iPhone SE */
+        @media (max-width: 375px) {
+            .hero-title {
+                font-size: 2rem !important;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                max-height: 85vh;
+            }
+            
+            .btn-primary {
+                padding: 8px 16px;
+                font-size: 0.875rem;
+            }
+            
+            .tag {
+                font-size: 0.65rem;
+                padding: 2px 6px;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Skeleton loading animation */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen font-sans">
     <!-- Header -->
     <header class="glass sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-4">
-                    <div class="bg-gradient-to-r from-primary to-secondary p-2 rounded-xl">
-                        <i class="fas fa-utensils text-white text-xl"></i>
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-14 sm:h-16">
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <div class="bg-gradient-to-r from-primary to-secondary p-1.5 sm:p-2 rounded-xl float-icon">
+                        <i class="fas fa-utensils text-white text-lg sm:text-xl"></i>
                     </div>
                     <div>
-                        <h1 class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                            Recipe Recommender
+                        <h1 class="text-lg sm:text-2xl font-bold gradient-text">
+                            FoodyMandy
                         </h1>
-                        <p class="text-sm text-gray-600">Smart Food Matcher</p>
+                        <p class="text-xs sm:text-sm text-gray-600 hidden xs:block">Smart Food Matcher</p>
                     </div>
                 </div>
-                <div class="hidden md:flex items-center space-x-6">
-                    <span class="text-gray-600 text-sm">Powered by Salima & GEMINI AI</span>
+                <div class="hidden sm:flex items-center space-x-6">
+                    <span class="text-gray-600 text-xs sm:text-sm">Powered by Idriss & GEMINI AI</span>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         <!-- Hero Section -->
-        <div class="text-center mb-12">
-            <h1 class="text-4xl md:text-6xl font-bold text-slate-900 mb-4">
+        <div class="text-center mb-8 sm:mb-12">
+            <h1 class="hero-title text-3xl sm:text-4xl md:text-6xl font-bold text-slate-900 mb-3 sm:mb-4 px-2">
                 What's in your 
-                <span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">kitchen</span>?
+                <span class="gradient-text">pantry</span>?
             </h1>
-            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            <p class="hero-subtitle text-base sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
                 Enter your ingredients and let our AI chef create amazing recipes just for you
             </p>
             
             <!-- Search Section -->
-            <div class="max-w-2xl mx-auto">
-                <div class="flex gap-4 mb-6">
+            <div class="search-box max-w-2xl mx-auto px-2">
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
                     <input
                         id="ingredientsInput"
                         type="text"
-                        placeholder="e.g., chicken, tomatoes, onions, garlic..."
-                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-lg"
+                        placeholder="e.g., chicken, tomatoes, onions..."
+                        class="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-base sm:text-lg"
                     />
-                    <button id="generateBtn" class="btn-primary">
+                    <button id="generateBtn" class="btn-primary whitespace-nowrap">
                         <i class="fas fa-magic mr-2"></i>
-                        Generate
+                        <span class="hidden xs:inline">Generate</span>
+                        <span class="xs:hidden">Go</span>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Tab Navigation -->
-        <div class="flex justify-center mb-8">
-            <div class="glass rounded-xl p-1">
-                <button id="searchTab" class="px-6 py-3 rounded-lg transition-all bg-gradient-to-r from-primary to-secondary text-white shadow-lg">
-                    <i class="fas fa-search mr-2"></i>
-                    New Recipes (<span id="newRecipesCount">0</span>)
-                </button>
-                <button id="savedTab" class="px-6 py-3 rounded-lg transition-all text-gray-600 hover:text-gray-900">
-                    <i class="fas fa-bookmark mr-2"></i>
-                    Saved Recipes (<span id="savedRecipesCount">0</span>)
-                </button>
+        <div class="flex justify-center mb-6 sm:mb-8">
+            <div class="glass rounded-xl p-1 w-full max-w-md">
+                <div class="grid grid-cols-2 gap-1">
+                    <button id="searchTab" class="tab-button px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-all bg-gradient-to-r from-primary to-secondary text-white shadow-lg text-sm sm:text-base">
+                        <i class="fas fa-search mr-1 sm:mr-2 text-xs sm:text-sm"></i>
+                        <span class="hidden xs:inline">New</span> (<span id="newRecipesCount">0</span>)
+                    </button>
+                    <button id="savedTab" class="tab-button px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-all text-gray-600 hover:text-gray-900 text-sm sm:text-base">
+                        <i class="fas fa-bookmark mr-1 sm:mr-2 text-xs sm:text-sm"></i>
+                        <span class="hidden xs:inline">Saved</span> (<span id="savedRecipesCount">0</span>)
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Content Area -->
-        <div id="contentArea" class="fade-in">
+        <div id="contentArea">
             <!-- Loading State -->
             <div id="loadingState" class="text-center py-20" style="display: none;">
                 <div class="loading-spinner"></div>
-                <p class="mt-4 text-gray-600">Our AI chef is cooking up something special...</p>
+                <p class="mt-4 text-gray-600 text-sm sm:text-base px-4">
+                    Our AI chef is cooking up something special
+                    <span class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </p>
             </div>
 
             <!-- Empty State -->
-            <div id="emptyState" class="text-center py-20">
-                <div class="glass rounded-2xl p-12 max-w-md mx-auto">
-                    <i class="fas fa-utensils text-6xl text-gray-300 mb-6"></i>
-                    <h3 class="text-xl font-semibold text-gray-700 mb-4">Ready to Cook?</h3>
-                    <p class="text-gray-600">Enter your ingredients above to discover amazing recipes!</p>
+            <div id="emptyState" class="text-center py-12 sm:py-20">
+                <div class="glass rounded-2xl p-8 sm:p-12 max-w-md mx-auto">
+                    <i class="fas fa-utensils text-5xl sm:text-6xl text-gray-300 mb-4 sm:mb-6 float-icon"></i>
+                    <h3 class="text-lg sm:text-xl font-semibold text-gray-700 mb-3 sm:mb-4">Ready to Cook?</h3>
+                    <p class="text-sm sm:text-base text-gray-600">Enter your ingredients above to discover amazing recipes!</p>
                 </div>
             </div>
 
             <!-- Recipes Grid -->
-            <div id="recipesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none;"></div>
+            <div id="recipesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" style="display: none;"></div>
         </div>
     </main>
 
     <!-- Recipe Modal -->
     <div id="recipeModal" class="modal">
         <div class="modal-content">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 id="modalTitle" class="text-2xl font-bold"></h2>
-                    <button id="closeModal" class="text-gray-500 hover:text-gray-700 text-2xl">
+            <div class="p-4 sm:p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 id="modalTitle" class="text-xl sm:text-2xl font-bold pr-4"></h2>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700 text-xl sm:text-2xl">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 
-                <div id="modalContent"></div>
+                <div id="modalContent" class="text-sm sm:text-base"></div>
             </div>
         </div>
     </div>
 
     <!-- Notification -->
-    <div id="notification" class="notification"></div>
+    <div id="notification" class="notification text-sm sm:text-base"></div>
 
     <script>
         //const API_BASE = 'http://localhost:8002/api';
@@ -278,22 +505,22 @@
             hideLoading();
         }
 
-        // Create Recipe Card HTML
-        function createRecipeCard(recipe) {
+        // Create Recipe Card HTML with animations
+        function createRecipeCard(recipe, index) {
             return `
-                <div class="glass rounded-xl p-6 card-hover cursor-pointer" onclick="openRecipeModal(${recipe.id})">
+                <div class="recipe-card glass rounded-xl p-4 sm:p-6 card-hover cursor-pointer" onclick="openRecipeModal(${recipe.id})">
                     <div class="mb-4">
-                        <div class="h-32 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center mb-4">
-                            <i class="fas fa-cookie-bite text-4xl text-primary/30"></i>
+                        <div class="h-24 sm:h-32 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center mb-3 sm:mb-4">
+                            <i class="fas fa-cookie-bite text-3xl sm:text-4xl text-primary/30 float-icon"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${recipe.title}</h3>
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-2">${recipe.title}</h3>
                         
                         <div class="flex flex-wrap gap-1 mb-3">
                             ${recipe.ingredients.slice(0, 3).map(ing => `<span class="tag">${ing}</span>`).join('')}
-                            ${recipe.ingredients.length > 3 ? `<span class="tag">+${recipe.ingredients.length - 3} more</span>` : ''}
+                            ${recipe.ingredients.length > 3 ? `<span class="tag">+${recipe.ingredients.length - 3}</span>` : ''}
                         </div>
 
-                        <div class="flex justify-between items-center text-sm text-gray-600">
+                        <div class="flex justify-between items-center text-xs sm:text-sm text-gray-600">
                             <span><i class="far fa-clock mr-1"></i>${recipe.prep_time}</span>
                             <span><i class="fas fa-signal mr-1"></i>${recipe.difficulty}</span>
                         </div>
@@ -302,14 +529,14 @@
             `;
         }
 
-        // Render Recipes
+        // Render Recipes with staggered animation
         function renderRecipes(recipes) {
             if (recipes.length === 0) {
                 showEmpty();
                 return;
             }
 
-            recipesGrid.innerHTML = recipes.map(createRecipeCard).join('');
+            recipesGrid.innerHTML = recipes.map((recipe, index) => createRecipeCard(recipe, index)).join('');
             showRecipes();
         }
 
@@ -330,16 +557,21 @@
             }
         }
 
-        // Generate Recipes
+        // Generate Recipes with animations
         async function generateRecipes() {
             const ingredients = ingredientsInput.value.trim();
             if (!ingredients) {
                 showNotification('Please enter some ingredients!', 'warning');
+                // Add shake animation to input
+                ingredientsInput.style.animation = 'pulse-soft 0.5s';
+                setTimeout(() => {
+                    ingredientsInput.style.animation = '';
+                }, 500);
                 return;
             }
 
             generateBtn.disabled = true;
-            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generating...';
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1 sm:mr-2"></i><span class="hidden xs:inline">Generating...</span><span class="xs:hidden">...</span>';
             showLoading();
 
             try {
@@ -355,7 +587,7 @@
                     newRecipesCount.textContent = currentRecipes.length;
                     renderRecipes(currentRecipes);
                     showNotification(`Generated ${data.count} recipes!`);
-                    await fetchAllRecipes(); // Refresh saved recipes
+                    await fetchAllRecipes();
                 } else {
                     showNotification(data.error || 'Failed to generate recipes', 'error');
                     showEmpty();
@@ -365,33 +597,33 @@
                 showEmpty();
             } finally {
                 generateBtn.disabled = false;
-                generateBtn.innerHTML = '<i class="fas fa-magic mr-2"></i>Generate';
+                generateBtn.innerHTML = '<i class="fas fa-magic mr-1 sm:mr-2"></i><span class="hidden xs:inline">Generate</span><span class="xs:hidden">Go</span>';
             }
         }
 
-        // Open Recipe Modal
+        // Open Recipe Modal with animation
         function openRecipeModal(recipeId) {
             const recipe = [...currentRecipes, ...allRecipes].find(r => r.id === recipeId);
             if (!recipe) return;
 
             modalTitle.textContent = recipe.title;
             modalContent.innerHTML = `
-                <div class="space-y-6">
+                <div class="space-y-4 sm:space-y-6">
                     <div class="flex flex-wrap gap-2">
                         <span class="tag"><i class="far fa-clock mr-1"></i>${recipe.prep_time}</span>
                         <span class="tag"><i class="fas fa-signal mr-1"></i>${recipe.difficulty}</span>
                     </div>
 
                     <div>
-                        <h4 class="text-lg font-semibold mb-3 flex items-center">
+                        <h4 class="text-base sm:text-lg font-semibold mb-3 flex items-center">
                             <i class="fas fa-list-ul mr-2 text-primary"></i>
                             Ingredients
                         </h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             ${recipe.ingredients.map(ing => 
                                 `<div class="flex items-center bg-gray-50 p-2 rounded-lg">
-                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                                    <span>${ing}</span>
+                                    <i class="fas fa-check-circle text-green-500 mr-2 text-sm"></i>
+                                    <span class="text-sm sm:text-base">${ing}</span>
                                 </div>`
                             ).join('')}
                         </div>
@@ -400,17 +632,17 @@
                     <hr class="border-gray-200">
 
                     <div>
-                        <h4 class="text-lg font-semibold mb-3 flex items-center">
+                        <h4 class="text-base sm:text-lg font-semibold mb-3 flex items-center">
                             <i class="fas fa-tasks mr-2 text-secondary"></i>
                             Instructions
                         </h4>
-                        <div class="space-y-3">
+                        <div class="space-y-2 sm:space-y-3">
                             ${recipe.instructions.map((step, idx) =>
-                                `<div class="flex items-start bg-blue-50 p-3 rounded-lg">
-                                    <div class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-semibold mr-3 mt-0.5">
+                                `<div class="flex items-start bg-blue-50 p-2.5 sm:p-3 rounded-lg">
+                                    <div class="bg-primary text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs sm:text-sm font-semibold mr-2 sm:mr-3 mt-0.5 flex-shrink-0">
                                         ${idx + 1}
                                     </div>
-                                    <span class="flex-1">${step}</span>
+                                    <span class="flex-1 text-sm sm:text-base">${step}</span>
                                 </div>`
                             ).join('')}
                         </div>
@@ -418,19 +650,20 @@
                 </div>
             `;
             modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
 
-        // Tab Switching
+        // Tab Switching with animation
         function switchTab(tab) {
             activeTab = tab;
             
             if (tab === 'search') {
-                searchTab.className = 'px-6 py-3 rounded-lg transition-all bg-gradient-to-r from-primary to-secondary text-white shadow-lg';
-                savedTab.className = 'px-6 py-3 rounded-lg transition-all text-gray-600 hover:text-gray-900';
+                searchTab.className = 'tab-button active px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-all bg-gradient-to-r from-primary to-secondary text-white shadow-lg text-sm sm:text-base';
+                savedTab.className = 'tab-button px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-all text-gray-600 hover:text-gray-900 text-sm sm:text-base';
                 renderRecipes(currentRecipes);
             } else {
-                searchTab.className = 'px-6 py-3 rounded-lg transition-all text-gray-600 hover:text-gray-900';
-                savedTab.className = 'px-6 py-3 rounded-lg transition-all bg-gradient-to-r from-primary to-secondary text-white shadow-lg';
+                searchTab.className = 'tab-button px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-all text-gray-600 hover:text-gray-900 text-sm sm:text-base';
+                savedTab.className = 'tab-button active px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg transition-all bg-gradient-to-r from-primary to-secondary text-white shadow-lg text-sm sm:text-base';
                 renderRecipes(allRecipes);
             }
         }
@@ -442,13 +675,36 @@
         });
         searchTab.addEventListener('click', () => switchTab('search'));
         savedTab.addEventListener('click', () => switchTab('saved'));
-        closeModal.addEventListener('click', () => modal.style.display = 'none');
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.style.display = 'none';
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Add input animation on focus
+        ingredientsInput.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+        });
+
+        ingredientsInput.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
         });
 
         // Initialize
         fetchAllRecipes();
+
+        // Add viewport height fix for mobile browsers
+        function setVH() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        setVH();
+        window.addEventListener('resize', setVH);
     </script>
 </body>
 </html>

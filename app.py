@@ -112,15 +112,18 @@ def get_recipes():
         Return ONLY a JSON array with this exact format:
         [
           {{
-            "title": "Recipe Name",
-            "ingredients": ["ingredient1", "ingredient2", "ingredient3"],
-            "instructions": ["step1", "step2", "step3"],
-            "prep_time": "15 mins",
-            "difficulty": "Easy"
+            "title": "Recipe Name", # string
+            "ingredients": ["ingredient1", "ingredient2", "ingredient3"], # list of ingredients
+            "instructions": ["step1", "step2", "step3"], # list of steps
+            "prep_time": "15 mins", # e.g. "15 mins", "1 hour"
+            "difficulty": "Easy" # Easy, Medium, Hard,
+            "image_url": "https://example.com/image.jpg" # optional, URL of a representative image
           }}
         ]
         
         Make sure recipes are practical and use common cooking methods.
+        But no matter the language of the ingredients, respond in the same language.
+        Try to get the language from the ingredients.
         """
         
         # Get response from Gemini
